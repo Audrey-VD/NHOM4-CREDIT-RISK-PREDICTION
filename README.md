@@ -2,9 +2,6 @@
 
 Hệ thống dự đoán rủi ro vỡ nợ tín dụng cá nhân tích hợp pipeline tự động hoàn chỉnh: **Google Sheets → ETL → Machine Learning → Docker Swarm → Real-time Dashboard**.
 
-Được xây dựng trong khuôn khổ môn học **Tính Toán Hiệu Suất Cao (HPC)** – Mã học phần: 26D1INF50907701  
-Giảng viên hướng dẫn: **TS.GVC Nguyễn Quốc Hùng** – Trường Đại học Kinh tế TP.HCM (UEH)
-
 ---
 
 ## 📋 Mục lục
