@@ -19,7 +19,7 @@ Hệ thống dự đoán rủi ro vỡ nợ tín dụng cá nhân tích hợp pi
 
 ## Tổng quan hệ thống
 
-Hệ thống sử dụng bộ dữ liệu **UCI Default of Credit Card Clients** (30,000 mẫu, 25 features) để huấn luyện mô hình **XGBoost** dự đoán khả năng vỡ nợ của khách hàng trong tháng tới.
+Hệ thống sử dụng bộ dữ liệu **UCI Default of Credit Card Clients** (30,000 mẫu, 25 features) để huấn luyện mô hình **LightGBM** dự đoán khả năng vỡ nợ của khách hàng trong tháng tới.
 
 Điểm khác biệt so với demo thông thường: hệ thống được thiết kế theo mô hình **MLOps thực tế**, trong đó dữ liệu khách hàng mới được nhập vào **Google Sheets**, tự động được kéo về xử lý mỗi ngày qua cơ chế **Webhook + BackgroundTasks**, kết quả dự đoán hiển thị trực tiếp trên **Web Dashboard real-time** không cần reload trang.
 
@@ -30,57 +30,8 @@ Toàn bộ hệ thống được triển khai trên **Docker Swarm Cluster 3 nod
 ## Kiến trúc
 
 ```
-Google Sheets (4 sheets)
-       │
-       │  Apps Script – Time trigger 6:00 AM
-       │  UrlFetchApp.fetch() POST /etl-trigger
-       ▼
-┌─────────────────────────────────────────┐
-│          FastAPI (Python)               │
-│  /etl-trigger  → 202 Accepted ngay      │
-│  BackgroundTask: ETL + Inference        │
-│  /dashboard-data → SSE stream           │
-└──────────┬──────────────────────────────┘
-           │
-    ┌──────┴──────┐
-    │             │
-    ▼             ▼
-preprocessor.pkl  model.pkl
-(feature eng +   (XGBoost –
- RobustScaler)    predict_proba)
-    │             │
-    └──────┬──────┘
-           │
-           ▼
-    SQLite Database
-    (predictions, etl_log)
-           │
-           │  SSE push "new_predictions"
-           ▼
-    Web Dashboard
-    (auto-refresh, DataTables, Chart.js)
-           │
-    ┌──────┴──────────────┐
-    │  Docker Swarm       │
-    │  vps1 (manager)     │
-    │  vps2 (worker)      │
-    │  vps3 (worker)      │
-    │  3 replicas – IPVS  │
-    └─────────────────────┘
+
 ```
-
-### Tại sao tách `preprocessor.pkl` và `model.pkl`?
-
-Thay vì gộp chung thành một `pipeline.pkl`, hệ thống tách thành hai artifact độc lập:
-
-| Artifact | Nội dung | Cập nhật khi nào |
-|---|---|---|
-| `preprocessor.pkl` | `CreditFeatureEngineer` + `ColumnTransformer` (RobustScaler + OHE) | Khi định nghĩa features thay đổi hoặc data drift ở tầng features |
-| `model.pkl` | XGBoost đã train | Khi concept drift – phân phối target thay đổi theo thời gian |
-
-Lợi ích: có thể swap `model.pkl` mới mà không cần refit scaler; debug độc lập từng tầng.
-
----
 
 ## Công nghệ sử dụng
 
@@ -91,12 +42,12 @@ Lợi ích: có thể swap `model.pkl` mới mà không cần refit scaler; debu
 - **SQLite** – WAL mode, index tối ưu cho Dashboard queries
 
 ### Machine Learning
-- **XGBoost** – Mô hình chính (scale_pos_weight xử lý imbalanced)
+- **LightGBM** – Mô hình chính 
 - **scikit-learn** – Pipeline, ColumnTransformer, RobustScaler, OneHotEncoder
-- **imbalanced-learn** – SMOTE
+- **imbalanced-learn** – SMOTE or Undersampling
 - **SHAP** – Giải thích mô hình
 
-### Feature Engineering (`CreditFeatureEngineer`)
+### Feature Engineering
 8 derived features được tạo tự động từ 23 features gốc:
 
 | Feature | Ý nghĩa tài chính |
@@ -124,7 +75,7 @@ Lợi ích: có thể swap `model.pkl` mới mà không cần refit scaler; debu
 ### HPC Infrastructure
 - **Docker** – Containerization
 - **Docker Swarm** – Orchestration, load balancing (IPVS), rolling update
-- **Docker Machine + Hyper-V** – 3 Virtual Machines
+- **VMare** – 3 Virtual Machines
 
 ---
 
@@ -133,38 +84,40 @@ Lợi ích: có thể swap `model.pkl` mới mà không cần refit scaler; debu
 ```
 credit_risk_predictor/
 │
-├── requirements.txt            # Python dependencies
-├── service-account.json        # Google Service Account (KHÔNG commit lên Git)
-├── credit_risk.db              # SQLite database (tự tạo khi chạy)
-├── .env                        # Biến môi trường (KHÔNG commit lên Git)
+├── requirements.txt
+├── service-account.json
+├── credit_risk.db
+├── .env
 │
 ├── docker/
-│   ├── Dockerfile              # Build image API service
-│   └── swarm-stack.yml         # Cấu hình Docker Swarm: 3 replicas, health check, rolling update
+│   ├── Dockerfile
+│   └── swarm-stack.yml
 │
 ├── api/
 │   ├── __init__.py
-│   ├── main.py                 # FastAPI app: endpoints, SSE, startup event
-│   ├── database.py             # SQLite schema, insert, get_high_risk, get_stats
-│   └── scheduler.py            # BackgroundTask ETL + Inference, load_trained_model()
+│   ├── main.py  
+│   ├── database.py
+│   └── scheduler.py 
 │
 ├── etl/
 │   ├── __init__.py
-│   └── sheets_to_df.py         # pull_sheets(), sort_by_recency(), pivot_to_wide()
+│   └── sheets_to_df.py
 │
 ├── model/
-│   ├── preprocessor.pkl        # CreditFeatureEngineer + ColumnTransformer (fit trên X_train)
-│   ├── model.pkl               # XGBoost đã train
-│   ├── feature_names.pkl       # Tên 23 features đầu vào raw
-│   └── config.json             # model_type, optimal_threshold
+│   ├── preprocessor.pkl
+│   ├── model.pkl    
+│   ├── feature_names.pkl     
+│   └── config.json            
 │
 ├── notebooks/
-│   └── EDA.ipynb               # Phân tích EDA + training pipeline
+│   └── eda.ipynb
+│   └── preprocessing.ipynb
+│   └── training.ipynb
 │
 └── dashboard/
-    ├── index.html              # Web UI – Bootstrap 5, DataTables, Chart.js
-    ├── style.css               # Conditional formatting (High/Medium/Low colors)
-    └── app.js                  # SSE EventSource, fetchAndRenderStats(), DataTable
+    ├── index.html              
+    ├── style.css               
+    └── app.js               
 ```
 
 ---
