@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Risk MLOps Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar p-3 d-none d-md-block">
+            <h5 class="text-center py-3 border-bottom border-secondary text-warning">
+                <i class="fa-solid fa-shield-halved me-2"></i>MLOps Cluster
+            </h5>
+            <ul class="nav flex-column mt-4">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-white active bg-primary rounded px-3" href="#">
+                        <i class="fa-solid fa-chart-pie me-2"></i>Tổng Quan UI
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-secondary px-3" href="/docs" target="_blank">
+                        <i class="fa-solid fa-code me-2"></i>Swagger APIs
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-md-10 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark m-0">Hệ Thống Giám Sát Rủi Ro Tín Dụng Cá Nhân</h2>
+                    <small class="text-muted">Kiến trúc HPC Cluster Docker Swarm - Node: <span id="node-id-badge" class="fw-bold text-primary">...</span></small>
+                </div>
+                <div>
+                    <span class="badge bg-dark text-light badge-update shadow-sm">
+                        <i class="fa-solid fa-clock-rotate-left me-2"></i>Trạng thái: 
+                        <span id="sse-status" class="text-warning fw-bold">Đang kết nối SSE...</span>
+                    </span>
+                    <span id="update-time-badge" class="badge bg-secondary text-white badge-update shadow-sm ms-2">
+                        Cập nhật: Chưa nhận dữ liệu
+                    </span>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card card-stat bg-white shadow-sm p-3 border-start border-primary border-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase small font-weight-bold">Tổng Khách Hàng</h6>
+                                <h3 id="stat-total" class="fw-bold m-0 text-dark">0</h3>
+                            </div>
+                            <i class="fa-solid fa-users fa-2x text-primary opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-stat bg-white shadow-sm p-3 border-start border-danger border-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase small font-weight-bold">Nguy Cơ Cao (High)</h6>
+                                <h3 id="stat-high" class="fw-bold m-0 text-danger">0</h3>
+                            </div>
+                            <i class="fa-solid fa-triangle-exclamation fa-2x text-danger opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-stat bg-white shadow-sm p-3 border-start border-warning border-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase small font-weight-bold">Trung Bình (Medium)</h6>
+                                <h3 id="stat-medium" class="fw-bold m-0 text-warning">0</h3>
+                            </div>
+                            <i class="fa-solid fa-circle-exclamation fa-2x text-warning opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-stat bg-white shadow-sm p-3 border-start border-success border-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted text-uppercase small font-weight-bold">An Toàn (Low)</h6>
+                                <h3 id="stat-low" class="fw-bold m-0 text-success">0</h3>
+                            </div>
+                            <i class="fa-solid fa-square-check fa-2x text-success opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card border-none shadow-sm p-3 bg-white h-100">
+                        <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-pie me-2 text-info"></i>Phân Phối Tỷ Lệ Rủi Ro</h6>
+                        <div class="chart-container d-flex justify-content-center align-items-center" style="position: relative; height:220px;">
+                            <canvas id="riskPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card border-none shadow-sm p-3 bg-white h-100">
+                        <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-line me-2 text-success"></i>Xu Hướng Biến Động Hồ Sơ Rủi Ro Cao</h6>
+                        <div style="position: relative; height:220px;">
+                            <canvas id="riskLineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-none shadow-sm p-3 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-dark m-0">
+                        <i class="fa-solid fa-list-check me-2 text-danger"></i>Danh Sách Hồ Sơ Khách Hàng Nguy Cơ Vỡ Nợ Cao
+                    </h6>
+                    <div>
+                        <button id="btn-export-csv" class="btn btn-sm btn-outline-success me-2">
+                            <i class="fa-solid fa-file-csv me-1"></i>Xuất Excel/CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="predictionsTable" class="table table-hover table-striped w-100 text-center align-middle">
+                        <thead class="table-dark text-white">
+                            <tr>
+                                <th>Mã KH</th>
+                                <th>Hạn Mức Tín Dụng</th>
+                                <th>Tuổi</th>
+                                <th>Trạng Thái Trả Nợ (PAY_0)</th>
+                                <th>Xác Suất Vỡ Nợ</th>
+                                <th>Mức Độ Rủi Ro</th>
+                                <th>Thời Gian Dự Đoán</th>
+                                <th>Giải Thích Mô Hình</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shapModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-none">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-brain me-2"></i>Giải Thích AI Đóng Góp Rủi Ro (SHAP Value)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted">Chi tiết các đặc trưng trọng yếu thúc đẩy thuật toán phân loại khách hàng này vào nhóm <strong class="text-danger">Nguy Cơ Cao</strong>:</p>
+                <div class="mb-3">
+                    <h6>Mã định danh khách hàng: <span id="shap-customer-id" class="text-primary fw-bold">#0</span></h6>
+                    <h6>Tổng xác suất dự báo vỡ nợ: <span id="shap-customer-prob" class="text-danger fw-bold">0.0%</span></h6>
+                </div>
+                <div id="shap-bars-container">
+                    </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng giao diện</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net@1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="app.js"></script>
+</body>
+</html>

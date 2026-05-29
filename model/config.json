@@ -1,0 +1,45 @@
+{
+  "model_version": "1.0",
+  "train_date": "2026-05-21",
+  "best_model": "LightGBM",
+  "optimal_threshold": 0.3859,
+  "roc_auc": 0.7755,
+  "accuracy": 0.7997,
+  "n_features": 38,
+  "model_type": "sklearn",
+  "needs_scaler": false,
+  "all_results": [
+    {
+      "model": "FT-Transformer",
+      "roc_auc": 0.773028804217852,
+      "pr_auc": 0.5428376514796733,
+      "f1": 0.5367904695164681,
+      "accuracy": 0.7796666666666666,
+      "threshold": 0.562
+    },
+    {
+      "model": "Logistic Regression",
+      "roc_auc": 0.7464686342085101,
+      "pr_auc": 0.5043396436760633,
+      "f1": 0.5210810810810811,
+      "accuracy": 0.7785,
+      "threshold": 0.591
+    },
+    {
+      "model": "LightGBM",
+      "roc_auc": 0.7754787035981364,
+      "pr_auc": 0.5600026570305083,
+      "f1": 0.5453857791225416,
+      "accuracy": 0.7996666666666666,
+      "threshold": 0.384
+    },
+    {
+      "model": "Random Forest",
+      "roc_auc": 0.7748660674905996,
+      "pr_auc": 0.5505764278005488,
+      "f1": 0.539568345323741,
+      "accuracy": 0.7866666666666666,
+      "threshold": 0.512
+    }
+  ]
+}

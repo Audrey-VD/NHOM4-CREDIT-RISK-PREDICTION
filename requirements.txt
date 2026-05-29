@@ -1,0 +1,16 @@
+fastapi==0.110.0
+uvicorn==0.28.0
+pydantic==2.6.4
+
+python-dotenv==1.0.1
+pandas==2.2.1
+numpy
+scikit-learn==1.7.2
+joblib
+apscheduler==3.10.4
+gspread
+google-auth
+
+lightgbm
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch

@@ -1,0 +1,52 @@
+body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sidebar {
+    background-color: #212529;
+    min-height: 100vh;
+    color: #fff;
+}
+
+.card-stat {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.card-stat:hover {
+    transform: translateY(-3px);
+}
+
+.badge-update {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+}
+
+.bg-low {
+    background-color: #e8f5e9 !important;
+    color: #2e7d32;
+}
+
+.bg-medium {
+    background-color: #fffde7 !important;
+    color: #f57f17;
+}
+
+.bg-high {
+    background-color: #ffebee !important;
+    color: #c62828;
+}
+
+.table-responsive {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.modal-content {
+    border-radius: 12px;
+    border: none;
+}
