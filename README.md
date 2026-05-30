@@ -26,10 +26,7 @@ Toàn bộ hệ thống được triển khai trên **Docker Swarm Cluster 3 nod
 ---
 
 ## Kiến trúc
-
-```
-![Giao diện ứng dụng](./architecture.png)
-```
+![Kiến trúc](./architecture.png)
 
 ## Công nghệ sử dụng
 
