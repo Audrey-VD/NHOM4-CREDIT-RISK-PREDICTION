@@ -11,7 +11,7 @@ Hệ thống dự đoán rủi ro vỡ nợ tín dụng cá nhân tích hợp pi
 - [Các thư viện và công cụ sử dụng](#các-thư-viện-và-công-cụ-sử-dụng)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Cài đặt và chạy](#cài-đặt-và-chạy)
-- [Hình ảnh Dashboard] (#hình-ảnh-dashboard)
+- [Hình ảnh Dashboard](#hình-ảnh-dashboard)
 ---
 
 ## Tổng quan hệ thống
