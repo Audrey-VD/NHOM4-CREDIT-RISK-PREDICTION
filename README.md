@@ -21,7 +21,7 @@ Hệ thống sử dụng bộ dữ liệu **UCI Default of Credit Card Clients**
 ---
 
 ## Kiến trúc
-![Kiến trúc](./architecture.png)
+![Kiến trúc](./training-pipeline.png)
 
 ## Các thư viện và công cụ sử dụng
 
