@@ -11,17 +11,18 @@ Hệ thống dự đoán rủi ro vỡ nợ tín dụng cá nhân tích hợp pi
 - [Các thư viện và công cụ sử dụng](#các-thư-viện-và-công-cụ-sử-dụng)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Cài đặt và chạy](#cài-đặt-và-chạy)
-- [Hình ảnh Dashboard] (#hình-ảnh-Dashboard)
-
+- [Hình ảnh Dashboard] (#hình-ảnh-dashboard)
 ---
 
 ## Tổng quan hệ thống
-
-Hệ thống sử dụng bộ dữ liệu **UCI Default of Credit Card Clients** (30,000 mẫu, 25 features) để huấn luyện mô hình **LightGBM** dự đoán khả năng vỡ nợ của khách hàng trong tháng tới.
 ---
 
-## Kiến trúc
-![Kiến trúc](./training-pipeline.png)
+Hệ thống sử dụng bộ dữ liệu **UCI Default of Credit Card Clients** (30,000 mẫu, 25 features) để huấn luyện mô hình **LightGBM** dự đoán khả năng vỡ nợ của khách hàng trong tháng tới.
+
+---
+
+## Pipeline
+![Pipeline](./training-pipeline.png)
 
 ## Các thư viện và công cụ sử dụng
 
@@ -231,3 +232,11 @@ venv/
 `SECRET_TOKEN` được lưu trong **Apps Script Properties** và trong file `.env` ở server.
 
 ## Hình ảnh Dashboard
+### Tổng quan Giao diện Giám sát
+![Hình ảnh Dashboard](./e2e_step7-1.png)
+### Danh sách Hồ sơ Khách hàng Nguy cơ Vỡ nợ cao
+![Hình ảnh Dashboard](./e2e_step7-2.png)
+### Cửa sổ Giải thích AI bằng SHAP Value
+![Hình ảnh Dashboard](./e2e_step7-3.png)
+
+
